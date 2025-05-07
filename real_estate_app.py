@@ -1,11 +1,13 @@
 from flask import Flask, render_template, request, redirect, url_for
 import sqlite3
 from datetime import datetime
+import os
 
 app = Flask(__name__)
 
 def init_db():
-    with sqlite3.connect('properties.db') as conn:
+    db_path = '/tmp/properties.db' if os.getenv('VERCEL') else 'properties.db'
+    with sqlite3.connect(db_path) as conn:
         cursor = conn.cursor()
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS properties (
@@ -35,7 +37,8 @@ def index():
 
 @app.route('/listings')
 def listings():
-    with sqlite3.connect('properties.db') as conn:
+    db_path = '/tmp/properties.db' if os.getenv('VERCEL') else 'properties.db'
+    with sqlite3.connect(db_path) as conn:
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM properties")
         properties = cursor.fetchall()
